@@ -30,12 +30,39 @@ app.post("/cadastrar", function(req,res){
     
 })
 
-app.get("/consultar", function(req,res){
-    res.render("consultar.handlebars")
-})
 
 app.get("/atualizar", function(req,res){
-    res.render("atualizar.handlebars")
+    post.update({
+        nome: req.body.name,
+        telefone: req.body.telefone,
+        origem: req.body.origem,
+        data_contato: req.body.data_contato,
+        observacao: req.body.observacao
+    }), {where: {id: req.body.id}}}.then(function(){
+        res.redirect("/consulta")
+    }).catch(function(erro){
+    res.send("falha ao atuaizar os dados" + erro)
+    })
+)
+
+
+app.get("/consultar", function(req,res){
+    post.findAll().then(function(post){
+        res.render("consultar", {post: post})
+    })
+})
+
+app.get("/editar/:id", function(req,res){
+post.findAll({where: {"id": req.params.id}}).then(function(posts){
+res.render("editar",{post:posts})
+})
+})
+
+app.delete("/deletar/:id",function(req,res){
+    post.destroy({where: {"id": req.params.id}}).then(function(){
+        res.redirect("/consulta")
+    }).catch(function(erro){
+    res.send("falha ao deletar" +erro)})
 })
 
 app.listen("8081", function(req,res){
